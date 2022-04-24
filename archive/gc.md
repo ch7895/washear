@@ -1,4 +1,4 @@
-### jvm 
+### GC 
 
 https://www.betsol.com/blog/java-memory-management-for-java-virtual-machine-jvm/
 
