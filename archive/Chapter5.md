@@ -2,5 +2,8 @@
 
 ## 
 
-## 5.1 형 / 조립가능 / 병렬화 
+## 5.1 filtering
+
+- predicate(boolean을 반환하는 함수) 를 파라미터로 사용
+- distinct
 
