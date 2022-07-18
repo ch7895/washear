@@ -1,8 +1,9 @@
-package com.example.washere.chap4;
+package com.example.washere.chap4.chkyu;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +14,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
-public class Chap4Test {
+public class Chap4 {
 
     private List<Dish> menu = new ArrayList<>();
 
@@ -40,10 +41,6 @@ public class Chap4Test {
                         .limit(3)
                         .collect(toList());
         System.out.println(threeHighCaloricDishNames);
-
-
-
-
     }
 
     @After public void done(){
