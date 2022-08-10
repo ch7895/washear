@@ -1,4 +1,6 @@
-# Chapter5
+## Chapter4
+
+## 
 
 ## 5.1 filtering
 
@@ -115,10 +117,3 @@ words.stream()
           .limit(10)
           .forEach(System.out::println);
      ```
-
-
-### 정리
-- for-loop를 충분히 대체 할 수 있는 요소들이 있다. 
-- sql의 where절을 어플리케이션 단에서 어느정도 처리 할 수 있어 보인다. 
-- sort이후에 사용한다면 비효율적인 비용을 줄 일수 있다. 이부분은 for-loop 에서도 동일하게 고민해볼 만한 문제이다. 
-- map, flapMap은 filter가 선행된 이후에 사용하는것이 좋아보인다. 
