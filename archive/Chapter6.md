@@ -1,119 +1,57 @@
-## Chapter4
+## Chapter6
 
-## 
+## 6.1 collector
 
-## 5.1 filtering
+![collector](https://drek4537l1klr.cloudfront.net/urma2/Figures/06fig01_alt.jpg)
 
-- predicate(boolean을 반환하는 함수) 를 파라미터로 사용
-- distinct (hashcode, equals)
-![distinc](https://drek4537l1klr.cloudfront.net/urma2/Figures/05fig02_alt.jpg)
-
-## 5.2 slicing 
-
-false 시점 으로 구분
-- takeWhile : false 이전
-- dropWhile : false 이후
-```java
-List<Dish> filteredMenu
-    = specialMenu.stream()
-                 .filter(dish -> dish.getCalories() < 320)
-                 .collect(toList());
-```
-
-limit, skip 
-- limit : 앞에서부터 n개 까지
-- skip : 앞에서부터 n개 제외 
-
-상호보완해서 사용 고려
-
-## 5.3 mapping 
-
-스트림으로부터 일부정보들을 활용하여 새로운 스트림을 생성
-- map, 
-- flatMap
+- 컬렉터는 스트림의 요소들 변환을 수행한다. 
+- 스트림 그룹핑/파티셔닝을 수행한다. 
+- 리듀싱과 summarizing을 수행한다. 
 
 ```java
-words.stream()
-     .map(word -> word.split(""))
-     .distinct()
-     .collect(toList());
+List<Transaction> transactions = transactionStream.collect(Collectors.toList());
 ```
 
-![flatmap](https://drek4537l1klr.cloudfront.net/urma/Figures/05fig06_alt.jpg)
+- 간결하고, 유연한 문법을 제공
+- 스트림에서 'collect' 를 호출하면 내부적으로 reduction 수행
+- Collectors 클래스는 많은 static factory method를 제공한다. 
 
 
-## 5.4 finding and matching
+## 6.2 reducing and summarizing 
 
-스트림이 predicate 조건을 만족하는지 조사
-결과값은 boolean
+```java
+long howManyDishes = menu.stream().collect(Collectors.counting());
+long howManyDishes = menu.stream().count();
+``` 
+다른 collector들과 조합할때 counting이 유용하다
 
-- anyMatch : true가 1개이상
-- allMatch : 모두 true
-- noneMatch : 모두 false
+#### 최소,최대값 찾기
+```java
+Comparator<Dish> dishCaloriesComparator =  Comparator.comparingInt(Dish::getCalories);
+Optional<Dish> mostCalorieDish = menu.stream().collect(maxBy(dishCaloriesComparator));
+```
 
-     ```java
-     if(menu.stream().anyMatch(Dish::isVegetarian)) {
-          System.out.println("The menu is (somewhat) vegetarian friendly!!");
-     }
-     ```
-
-### find
-
-- findAny, findFirst
-- 현재 스트림의 1개 요소를 반환, 
-- 차이 : 순서보장(?)
-
-     ```java
-     List<Integer> someNumbers = Arrays.asList(1, 2, 3, 4, 5);
-     Optional<Integer> firstSquareDivisibleByThree =
-          someNumbers.stream()
-                       .map(n -> n * n)
-                       .filter(n -> n % 3 == 0)
-                       .findFirst(); // 9
-     ```
+#### summarizition
+ - Collectors 클래스는 summing 을 위한 함수륻 제공
+```java
+int totalCalories = menu.stream().collect(summingInt(Dish::getCalories));
+```
+- 스트림의 dish를 순회하며 calorie를 내부적으로 더함, 초기값은 0 설정
+  (자매품 : Collectors.summingLong, Collectors.summingDouble)
 
 
-## 5.5 reducing
+- 통계 구하기
+```java
+IntSummaryStatistics menuStatistics = menu.stream().collect(summarizingInt(Dish::getCalories));
+/**
+* IntSummaryStatistics{count=9, sum=4300, min=120, average=477.777778, max=800}
+*/
+```
 
-- 함수를 사용해서 스트림 
-
-- sum 
-
-     ```java
-     int sum = 0;
-     for (int x : numbers ) {
-          sum += x;
-     }
-
-     ...
-     int sum = numbers.stream().recude(0, a(,b) -> a+b)
-
-     int sum = numbers.parallelStream().reduce(0, Integer::sum);
-
-     ```
+#### joining strings
+```java
+/**
+ * 
+ * /
 
 
-- 스트림 중개함수/종단함수
-![operations](https://i0.wp.com/javaconceptoftheday.com/wp-content/uploads/2020/01/Java8StreamIntermediateVsTerminalOperations.png?w=626&ssl=1)
-
-
-
-## 5.8 Building Stremas
-
-- Stream.of
-     ```java
-     Stream<String> stream = Stream.of("Modern ", "Java ", "In ", "Action");
-     ```
-
-- Arrays.stream()
-     ```java
-     int[] numbers = {2, 3, 5, 7, 11, 13};
-     int sum = Arrays.stream(numbers).sum();
-     ```
-
-- infinite stream
-     ```java
-     Stream.iterate(0, n -> n + 2)
-          .limit(10)
-          .forEach(System.out::println);
-     ```
