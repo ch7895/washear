@@ -1,4 +1,4 @@
-package com.example.washere.chap4.chkyu;
+package com.example.washere;
 
 import lombok.Builder;
 import lombok.Data;
