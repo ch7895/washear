@@ -30,7 +30,7 @@ public class Chap7 {
                          .reduce(0L, Long::sum);
         
         long endTime = System.currentTimeMillis();
-        log.info("testStrema1 {}",endTime-startTime);
+        log.info("testStrema1 {},{}",endTime-startTime, Thread.currentThread().getStackTrace()[1].getMethodName());
 
         System.out.println(n);
     }

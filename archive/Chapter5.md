@@ -20,6 +20,7 @@ List<Dish> filteredMenu
 
 limit, skip 
 - limit : 앞에서부터 n개 까지
+     - limit이 걸려 있을경우 filter는 limit(수) 만큼만 수행한다
 - skip : 앞에서부터 n개 제외 
 
 상호보완해서 사용 고려
