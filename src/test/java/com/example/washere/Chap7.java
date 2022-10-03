@@ -98,9 +98,16 @@ public class Chap7 {
         int n = 1000;
         Accumulator accumulator = new Accumulator();
         LongStream.rangeClosed(1, n).parallel().forEach(accumulator::add);
-        log.info("sideEffectParallelSum {}", accumulator.total);
+        log.info("sideEffectParallelSum {}", accumulator.total);        
+    }
 
-        
+
+    @Test
+    public void sideEffectParallelSum2() {
+        int n = 1000;
+        Accumulator accumulator = new Accumulator();
+        LongStream.rangeClosed(1, n).parallel().forEach(accumulator::add);
+        log.info("sideEffectParallelSum {}", accumulator.total);        
     }
 
 }
