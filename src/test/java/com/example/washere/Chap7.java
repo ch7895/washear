@@ -1,13 +1,10 @@
 package com.example.washere;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.Before;
-
 import org.junit.Test;
-
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
-
 
 @Slf4j
 public class Chap7 {
@@ -69,5 +66,41 @@ public class Chap7 {
         System.out.println(n);
     }
 
+    @Test 
+    public void testStream3(){
+
+        long startTime = System.currentTimeMillis();
+        
+        Long n= LongStream.rangeClosed(1, 1000000)
+                        //.parallel()
+                        .reduce(0L, Long::sum);
+        
+        long endTime = System.currentTimeMillis();
+        log.info("testStrema3 {}",endTime-startTime);
+
+        System.out.println(n);
+    }
+
+
+
+    @Test 
+    public void sideEffectSum() {
+        int n = 1000;
+        Accumulator accumulator = new Accumulator();
+        LongStream.rangeClosed(1, n).forEach(accumulator::add);
+        log.info("sideEffectSum {}", accumulator.total);
+
+        
+    }
+
+    @Test
+    public void sideEffectParallelSum() {
+        int n = 1000;
+        Accumulator accumulator = new Accumulator();
+        LongStream.rangeClosed(1, n).parallel().forEach(accumulator::add);
+        log.info("sideEffectParallelSum {}", accumulator.total);
+
+        
+    }
 
 }
