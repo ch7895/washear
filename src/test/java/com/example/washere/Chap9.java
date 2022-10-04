@@ -23,9 +23,9 @@ public class Chap9 {
         
         Runnable r2 = () -> System.out.println("Hello2");
 
-
         r1.run();
         r2.run();
 
+        
     }
 }
