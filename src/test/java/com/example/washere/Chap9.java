@@ -1,31 +1,37 @@
 package com.example.washere;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
 import org.junit.Test;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
+
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+
+import com.example.washere.chap9.HeaderTextProcessing;
+import com.example.washere.chap9.ProcessingObject;
+import com.example.washere.chap9.SpellCheckerProcessing;
 
 @Slf4j
 public class Chap9 {
 
     
+    @Test 
+    public void testChainOfResponsibillity(){
 
-    public static void main(String ... args){
+        ProcessingObject<String> p1 = new HeaderTextProcessing();
+        ProcessingObject<String> p2 = new SpellCheckerProcessing();
 
-        System.out.println("asdf");
-        Runnable r1 = new Runnable() {
-     
-            public void run(){
-                System.out.println("Hello1");
-            }
-        };
-        
-        Runnable r2 = () -> System.out.println("Hello2");
+        p1.setSuccessor(p2);
+        //labdas -> lambda
+        String result = p1.handle("Aren't labdas really sexy?!");
+        log.info("testChainOfResponsibillity:{}", result);
 
-        r1.run();
-        r2.run();
-
-        
+        UnaryOperator<String> headerProcessing = (String text) -> "From Raoul, Mario and Alan : " + text;
+        UnaryOperator<String> spellCheckerProcessing = (String text) -> text.replaceAll("labda", "lambda");
+        Function<String, String> pipeline = headerProcessing.andThen(spellCheckerProcessing);
+        String result1 = pipeline.apply("Aren't labdas really sexy?!");
+        log.info("testChainOfResponsibillity:{}", result1);
+    
     }
+
+
 }

@@ -110,3 +110,133 @@
 
     }
 ```
+
+### template method
+
+- 전체적인 알고리즘의 개요는 정해져 있고, 일부 로직만 유연하게 사용하고 싶을때
+
+```java
+
+    abstract class OnlineBanking {
+        public void processCustomer(int id){
+            Customer c = Database.getCustomerWithId(id);
+            makeCustomerHappy(c);
+        }
+        abstract void makeCustomerHappy(Customer c);
+    }
+
+     //Consumer<Customer> 파라미터 추가
+    public void processCustomer(int id, Consumer<Customer> makeCustomerHappy) {
+                Customer c = Database.getCustomerWithId(id);
+                makeCustomerHappy.accept(c);
+    }
+
+    new OnlineBankingLambda().processCustomer(1337, (Customer c) -> System.out.println("Hello " + c.getName());
+```
+
+### Observer
+
+- 어떤 이벤트가 발생했때 한 객체가 다른객체리스트에 알림을 보낼 수 있는 패턴
+- 어떤 주식의 가격이 변경이 되었을때 트레이더들이 알고 싶을때
+```java
+    interface Observer {
+    void notify(String tweet);
+    }
+
+    Class NYTimes implements Observer {
+    public void notify(String tweet) {
+        if(tweet != null && tweet.contains("money")) {
+        System.out.println("Breaking news in NY!" + tweet);
+        }
+    }
+    }
+
+    Class Guardian implements Observer {
+    public void notify(String tweet) {
+        if(tweet != null && tweet.contains("queen")) {
+        System.out.println("Yet more news from London..." + tweet);
+        }
+    }
+    }
+
+    //2. 주제
+    interface Subject {
+    void registerObserver(Observer o);
+    void notifyObservers(String tweet);
+    }
+
+    Class Feed implements Subject {
+    private final List<Observer> observers = new ArrayList<>();
+    public void registerObserver(Observer o) {
+        this.observers.add(0);
+    }
+    public void notifyServeres(String tweet) {
+        observers.forEach(o -> o.notify(tweet));
+    }
+    }
+
+    Feed f = new Feed();
+    f.registerObserver(new NYTimes());
+    f.registerObserver(new Guardian());
+    f.notifyServeres("The queen said her favorite book is Modern Java in Action!");
+```
+
+lambda
+```java
+    // 각 옵저버들의 notify를 구현하지 말고 함수를 파라미터로 전달
+    f.registerObserver((String tweet) -> {
+            if(tweet != null && tweet.contains("money")){
+                System.out.println("Breaking news in NY! " + tweet);
+            }
+    });
+    f.registerObserver((String tweet) -> {
+            if(tweet != null && tweet.contains("queen")){
+                System.out.println("Yet more news from London... " + tweet);
+    }
+    });
+```
+
+### 의무체인
+- 작업 처리 객체의 체인을 만들때 의무 체인패턴
+- 보통 추상클래스로 구현되며 작업이 끝나면 후임자에게 넘겨줌
+```java
+    public abstract class processingObject<T> {
+    protected ProcessingObject<T> successor;
+    public void setSuccessor(ProcessingObject<T> successor) {
+        this.successor = successor;
+    }
+    public T handle(T input) {
+        T r = handleWork(input);
+        if(successor != null) {
+        return successor.handle(r);
+        }
+        return r;
+    }
+    abstract protected T handleWork(T input);
+    }
+
+    public class HeaderTextProcessing extends ProcessingObject<String> {
+        public String handleWork(String text) {
+            return "From Raoul, Mario and Alan : " + text;
+        }
+    }
+
+    public class SpellCheckerProcessing extends ProcessingObject<String> {
+        public String handleWork(String text) {
+            return text.replaceAll("labda", "lambda");
+        }
+    }
+
+    ProcessingObject<String> p1 = new HeaderTextProcessing();
+    ProcessingObject<String> p2 = new SpellCheckerProcessing();
+    p1.setSuccessor(p2); // chaining tow processing object
+    String result = p1.handle("Aren't labdas really sexy?!");
+    System.out.println(result);
+
+    //lamda 
+    UnaryOperator<String> headerProcessing = (String text) -> "From Raoul, Mario and Alan : " + text;
+UnaryOperator<String> spellCheckerProcessing = (String text) -> text.replaceAll("labda", "lambda");
+    Function<String, String> pipeline = headerProcessing.andThen(spellCheckerProcessing);
+    String result = pipeline.apply("Aren't labdas really sexy?!");
+
+```
