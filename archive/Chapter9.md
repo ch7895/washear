@@ -233,10 +233,91 @@ lambda
     String result = p1.handle("Aren't labdas really sexy?!");
     System.out.println(result);
 
-    //lamda 
+    //lambda 
     UnaryOperator<String> headerProcessing = (String text) -> "From Raoul, Mario and Alan : " + text;
-UnaryOperator<String> spellCheckerProcessing = (String text) -> text.replaceAll("labda", "lambda");
+    UnaryOperator<String> spellCheckerProcessing = (String text) -> text.replaceAll("labda", "lambda");
     Function<String, String> pipeline = headerProcessing.andThen(spellCheckerProcessing);
     String result = pipeline.apply("Aren't labdas really sexy?!");
 
 ```
+
+#### UnaryOperator
+- Type T의 인자를 하나 받고, 동일한 Type T객체를 리턴하는 함수형 인터페이스
+- Function 을 상속하며 apply() 호출하여 작업수행
+- func1.andThen(func2) -> apply() 호출시 func1의 결과가 func2의 인자로 전달, func2의 결과값을 리턴
+
+
+### factory 
+- 인스턴스화 로직을 노출하지 않고 객체를 생성할때
+- 팩토리클래스, 인스턴스 클래스 
+```java
+    public class ProdectFactor {
+        public static Product createProduct(String name) {
+            switch(name) {
+            case "loan" : return new Loan();
+            case "stock" : return new Stock();
+            case "bond" : return new Bond();
+            default : throw new RuntimeException("No Such product" + name);
+            }
+        }
+    }
+
+    product p = ProductFactory.createProduct("loan");
+
+    //lambda
+    메서드 참조
+    Supplier<Product> loanSupplier = Loan::new;
+    Loan loan = loanSupplier.get();
+
+    //상품명과 생성자를 연결하는 Map 코드로 재구현
+    final static Map<String, Supplier<Product>> map = new HashMap<>();
+    static {
+        map.put("loan", Loan::new);
+        map.put("stock", Stock::new);
+        map.put("bond", Bond::new);
+    }
+
+
+    //Map을 이용해 다양한 상품을 인스턴스화
+    public static Product createProduct(String name) {
+        Supplier<product> p = map.get(name);
+        if(p != null) return p.get();
+        throw new RuntimeException("No Such product" + name);
+    }
+
+```
+
+#### supplier 
+- T타입을 반환하는 함수를 정의하고, get 메서드를 통해 결과 리턴하는 메서드 하나만 가지고 있음
+
+### 9.3 Testing lambdas
+
+- 보통 좋은 소프트웨어 엔지니어 연습은 단위테스트로 프로그램의 행동을 보장한다. 
+```java
+    public class Point {
+        private final int x;
+        private final int y;
+        private Point(int x, int y) {
+            this.x = x;
+            this.y = y; 
+        }
+        
+        public int getX() { return x; }
+        public int getY() { return y; }
+        public Point moveRightBy(int x) {
+            return new Point(this.x + x, this.y);
+        }
+    }
+
+    //test moveRightBy 
+    @Test
+    public void testMoveRightBy() throws Exception {
+        Point p1 = new Point(5, 5);
+        Point p2 = p1.moveRightBy(10);
+        assertEquals(15, p2.getX());
+        assertEquals(5, p2.getY());
+    }
+```
+람다의 경우 이름을 가지고 있지 않다(익명함수), 그래서 이름으로 테스트를 하기 힘들다. 
+람다의 필드를 재사용할 수 있다. 
+
