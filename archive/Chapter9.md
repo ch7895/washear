@@ -319,5 +319,101 @@ lambda
     }
 ```
 람다의 경우 이름을 가지고 있지 않다(익명함수), 그래서 이름으로 테스트를 하기 힘들다. 
-람다의 필드를 재사용할 수 있다. 
+대신 람다를 필드에 저장해서 재사용할 수 있으며 로직을 테스트 할 수 있다. 
+람다는 함수형 인터페이스의 인스턴스를 생성한다. 그 인스턴스를 테스트 할 수 있다. 
+
+```java
+    public class Point {
+        public final static Comparator<Point> compareByXAndThenY = comparing(Point::getX).thenComparing(Point::getY);
+            ...
+    }
+
+    @Test
+    public void testComparingTwoPoints() throws Exception {
+        Point p1 = new Point(10, 15);
+        Point p2 = new Point(10, 20);
+        int result = Point.compareByXAndThenY.compare(p1 , p2);
+            assertTrue(result < 0);
+    }
+```
+
+### 람다를 사용하는 메서드
+
+람다의 목적은 다른 메서드에서 사용할 수 있도록 캡슐화 하는것, 
+람다로 표현한 구현식의 세부공개를 할 필요 없다. 
+```java
+    public static List<Point> moveAllPointsRightBy(List<Point> points, int x) {
+        return points.stream()
+                    .map(p -> new Point(p.getX() + x, p.getY()))
+                    .collect(toList());
+    }
+
+    @Test
+    public void testMoveAllPointsRightBy() throws Exception {
+        List<Point> points =  Arrays.asList(new Point(5, 5), new Point(10, 5));
+        List<Point> expectedPoints =   Arrays.asList(new Point(15, 5), new Point(20, 5));
+        List<Point> newPoints = Point.moveAllPointsRightBy(points, 10);
+        assertEquals(expectedPoints, newPoints);
+    }
+```
+
+### 복잡한 람다를 메소드로 분할 / 고차함수 
+
+복잡한 람다 표현식을 일반 메소드로 선언하여 메소드 참조 방식으로 처리
+함수를 파라미터로 받는것을 고차함수라한다. 
+
+
+## 9.4 디버깅
+
+문제의 코드 발견시 확인할 수 있는 방법
+- 스택트레이스
+- 로깅
+
+### stack trace
+
+람다는 이름이 없어서 확인이 어려울 수 있다. 
+굳이 이름을 찾는다면 'lambda$main$0'
+메서드 참조를 사용하면 메소드명으로 노출될 수 있다. 
+```java
+    public class Debugging{
+        public static void main(String[] args) {
+            List<Point> points = Arrays.asList(new Point(12, 2), null);
+            points.stream().map(p -> p.getX()).forEach(System.out::println);
+        }
+    }
+
+    Exception in thread "main" java.lang.NullPointerException
+    at Debugging.lambda$main$0(Debugging.java:6)
+    at Debugging$$Lambda$5/284720968.apply(Unknown Source)
+    at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:193)
+    at java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+
+    public static void main(String[] args) {
+        List<Integer> numbers = Arrays.asList(1, 2, 3);
+        numbers.stream().map(Debugging::divideByZero).forEach(System
+         .out::println);
+    }
+    public static int divideByZero(int n){
+        return n / 0;
+    }
+
+    Exception in thread "main" java.lang.ArithmeticException: / by zero
+    at Debugging.divideByZero(Debugging.java:10)
+    at Debugging$$Lambda$1/999966131.apply(Unknown Source)
+    at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline
+
+```
+
+### 로깅
+
+파이프라인의 중간연산 결과가 확인이 필요할 경우 peek을 사용하면 된다. 
+```java
+    IntStream.rangeClosed(1, 10)
+            .map(num -> num * 2)
+            .peek(num -> System.out.println("#1   " + num))
+            .map(num -> num + 1)
+            .peek(num -> System.out.println("#2   " + num))
+            .boxed().collect(Collectors.toList()); 
+```
+
 
